@@ -218,7 +218,7 @@ result.rows           # [('石家庄', 21), ('武汉', 19), ('成都', 14)]
 print(result.text())  # 对齐好的表格
 
 engine.explain("SELECT id FROM orders LIMIT 2")   # 计划文本
-engine.diagnose(result)                           # [Finding(...), ...]
+engine.diagnose(result)      # []：这条估得挺准；偏差大时返回 Finding 列表
 ```
 
 自己造表也很直接：
