@@ -1,0 +1,46 @@
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: ${{ matrix.os }} · py${{ matrix.python }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12", "3.13"]
+
+    env:
+      # 输出里有中文，强制 UTF-8 免得 Windows 控制台用 cp1252 编码报错
+      PYTHONUTF8: "1"
+      PYTHONIOENCODING: "utf-8"
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: 版本信息
+        run: python -V
+
+      - name: 跑测试
+        run: python run_tests.py
+
+      - name: 冒烟：查询与计划
+        run: |
+          python run.py "SELECT city, COUNT(*) FROM customers GROUP BY city ORDER BY 2 DESC LIMIT 3"
+          python run.py --scale 0.1 explain "SELECT p.category, COUNT(*) FROM order_items i JOIN products p ON i.product_id = p.id GROUP BY p.category"
+
+      - name: 冒烟：CSV 往返
+        run: |
+          python run.py sample --out ci-data --scale 0.02
+          python run.py --data ci-data "SELECT COUNT(*) FROM orders"

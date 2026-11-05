@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "banyan"
+version = "1.0.0"
+description = "带成本模型的 SQL 查询引擎：手写解析、基于统计信息的代价估算、连接重排与估算偏差诊断"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "遥か" }]
+keywords = ["sql", "query-engine", "query-optimizer", "cost-model", "database", "explain"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Database",
+    "Topic :: Education",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = []
+
+[project.scripts]
+banyan = "banyan.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/18971181532/banyan"
+
+[tool.setuptools]
+packages = ["banyan"]
