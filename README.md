@@ -37,12 +37,12 @@ Banyan 把这条链路整条摊开：从 `SELECT` 字符串开始，一步步走
 
 | 分类 | 内容 |
 | --- | --- |
-| **语法** | `SELECT` / `DISTINCT` / `WHERE` / `GROUP BY` / `HAVING` / `ORDER BY` / `LIMIT` / `OFFSET`；`INNER` / `LEFT` / `CROSS` JOIN；`CASE WHEN`；`IN` / `BETWEEN` / `LIKE` / `IS NULL`；表别名、列别名 |
+| **语法** | `SELECT` / `DISTINCT` / `WHERE` / `GROUP BY` / `HAVING` / `ORDER BY` / `LIMIT` / `OFFSET`；`INNER` / `LEFT` / `CROSS` JOIN；`CASE WHEN`；`IN` / `BETWEEN` / `LIKE` / `IS NULL`；表别名、列别名；`FROM` 可省略（`SELECT 1 + 1`） |
 | **表达式** | 完整优先级（`OR < AND < NOT < 比较 < \|\| < 加减 < 乘除 < 一元`）、三值逻辑、`NULL` 传播、隐式类型转换 |
 | **函数** | 19 个标量函数（数值、文本、`COALESCE` / `NULLIF` / `GREATEST`…）+ 5 个聚合函数（含 `DISTINCT` 修饰，`COUNT(*)`） |
 | **统计信息** | 每列的空值数、去重数、最小/最大值、16 桶等宽直方图、Top-8 高频值（MCV） |
 | **优化** | 谓词下推（含外连接的边界处理）、常量折叠、投影裁剪、**基于代价的连接重排**（left-deep 动态规划） |
-| **执行** | 火山模型（逐行拉取）、哈希连接 / 嵌套循环连接、哈希聚合、外存无依赖的内存排序 |
+| **执行** | 火山模型（逐行拉取）、哈希连接 / 嵌套循环连接、哈希聚合、纯内存排序（不落盘） |
 | **诊断** | 估算 vs 实际行数对照、q-error 排序、区分"原发偏差"与"上游传递"、按算子类型给出成因提示 |
 | **工具** | 命令行 7 个子命令、交互式 REPL、CSV 装载、内置电商星型数据集、基准脚本 |
 
@@ -67,7 +67,7 @@ cd banyan
 python run.py "SELECT city, COUNT(*) AS n FROM customers GROUP BY city ORDER BY n DESC LIMIT 5"
 ```
 
-第一次运行会自动生成一份内置的电商数据（2,000 客户 / 20,000 订单 / 60,000 明细），大约 0.2 秒。
+第一次运行会自动生成一份内置的电商数据（2,000 客户 / 20,000 订单 / 60,000 明细），大约 2 秒（纯 Python 逐行生成，没有做向量化）。
 
 也可以走标准入口：
 
