@@ -223,6 +223,24 @@ class StarTests(unittest.TestCase):
         self.assertEqual(result.columns, ["id", "name", "city"])
 
 
+class ConstantFoldingTests(unittest.TestCase):
+    """能在计划期算掉的常量表达式，不该留到执行期。"""
+
+    def test_predicate_is_folded_at_plan_time(self):
+        plan = plan_of("SELECT id FROM emp WHERE salary > 1000 + 2000")
+        details = [node.detail() for node in plan.walk() if isinstance(node, Filter)]
+        self.assertEqual(details, ["(salary > 3000)"])
+
+    def test_folding_keeps_the_written_column_name(self):
+        result = support.engine().query("SELECT 1 + 1")
+        self.assertEqual(result.columns, ["(1 + 1)"])   # 表头跟着折叠变就太怪了
+        self.assertEqual(result.rows, [(2,)])
+
+    def test_unfoldable_expression_still_fails_at_run_time(self):
+        # 除零在计划期折叠时会失败，此时应退回未折叠的表达式，交给执行期报错
+        self.assertEqual(support.error_of("SELECT 1 / 0"), "EvalError")
+
+
 class NoFromTests(unittest.TestCase):
     """没有 FROM 的查询：来源是一行零列，用来算纯表达式。"""
 

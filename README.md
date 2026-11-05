@@ -6,7 +6,7 @@
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776ab)
 ![依赖](https://img.shields.io/badge/依赖-零-3fb950)
-![测试](https://img.shields.io/badge/测试-359-1f6feb)
+![测试](https://img.shields.io/badge/测试-362-1f6feb)
 ![许可](https://img.shields.io/badge/许可-MIT-b06000)
 
 ---
@@ -395,7 +395,7 @@ banyan/
 │   ├── console.py      终端对齐与颜色
 │   ├── cli.py          七个子命令（query/explain/tables/sample/shell/bench/functions）
 │   └── __main__.py     支持 python -m banyan
-├── tests/              11 个测试文件 · 359 个测试
+├── tests/              11 个测试文件 · 362 个测试
 │   ├── support.py             固定小数据集
 │   ├── test_lexer.py          词法
 │   ├── test_parser.py         语法与错误信息
@@ -423,7 +423,7 @@ banyan/
 ```bash
 $ python run_tests.py
 ..........................................................................
-359 个测试 · 1.54s · 0 失败 · 0 错误
+362 个测试 · 1.55s · 0 失败 · 0 错误
 ```
 
 除了常规的逐函数测试，有两类测试值得单独说：

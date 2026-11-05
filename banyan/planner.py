@@ -27,7 +27,7 @@ from .estimate import (
 )
 from .expr import (
     AggRef, BetweenExpr, BinaryOp, Call, CaseExpr, Const, Expr, InExpr,
-    IsNullExpr, LikeExpr, Ref, UnaryOp, refs_of,
+    IsNullExpr, LikeExpr, Ref, UnaryOp, refs_of, simplify,
 )
 from .functions import check_aggregate, check_scalar, is_aggregate
 
@@ -78,7 +78,8 @@ class Binder:
         method = getattr(self, f"_bind_{type(node).__name__.lower()}", None)
         if method is None:
             raise BindError(f"不支持的表达式 {type(node).__name__}", sql=None)
-        return method(node)
+        # 绑定完顺手做常量折叠：`WHERE x > 1 + 1` 里的加法不必留到执行期
+        return simplify(method(node))
 
     # -- 各类节点 ---------------------------------------------------------
     def _bind_literal(self, node: ast.Literal) -> Expr:
@@ -931,7 +932,9 @@ def _bind_select_item(item: ast.SelectItem, binder: Binder) -> Tuple[Expr, str]:
 def _default_name(node: ast.Node, expr: Expr) -> str:
     if isinstance(node, ast.Column):
         return node.name
-    return expr.render()
+    # 用语法树的原始写法做列名：常量折叠会把 `1 + 1` 变成 `2`，
+    # 表头跟着变就太怪了
+    return str(node)
 
 
 def _resolve_order(item: ast.OrderItem, binder: Binder, alias_map: Dict[str, int],
